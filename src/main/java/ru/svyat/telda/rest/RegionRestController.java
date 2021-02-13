@@ -2,6 +2,7 @@ package ru.svyat.telda.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,27 @@ public class RegionRestController {
     public RegionMapper regionMapper;
 
     @GetMapping
+    @Cacheable("regions")
     public ResponseEntity<List<Region>> getAll() {
+        //simulateSlowService();
         List<Region> res = regionMapper.findAll();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    // wow cache is awesome...
+ /*   private void simulateSlowService() {
+        try {
+            long time = 3000L;
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }*/
+
     @GetMapping("/{id}")
+    @Cacheable("regions")
     public ResponseEntity<Region> getRegionById(@PathVariable Integer id) {
+        //simulateSlowService();
         if (id == null ) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -46,8 +61,10 @@ public class RegionRestController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Region> deleteRegionById(@RequestBody Region region,
+    @Cacheable("regions")
+    public ResponseEntity<Region> updateRegionById(@RequestBody Region region,
                                                    @PathVariable Integer id) {
+        //simulateSlowService();
         if (region == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
